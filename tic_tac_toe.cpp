@@ -1,91 +1,154 @@
 #include <iostream>
+#include <cctype>
 using namespace std;
-bool Check(char A[3][3], char x)
-{   
-    int m = 0, n = 0, j = 0, foo = 1,goo=0;
-    // Checks if winning is possible diagonally
-    if (A[m][n] == A[m + 1][n + 1] && A[m][n] == A[m + 2][m + 2] || A[m][n + 2] == A[m + 1][n + 1] && A[m][n + 2] == A[m + 2][n])
+
+bool Setvalues(char A[3][3], int n, char x)
+{
+    if (n == 1 && A[0][0] == ' ')
     {
-        if (A[m][n] == x)
-        {
-            // cout<< "block 1 is being executed 1 ...";
-            foo = 0;
-            
-        }
+        A[0][0] = x;
+        return true;
     }
-    // Checks if winning is possible linearly
-    else if (foo == 1)
+    if (n == 2 && A[0][1] == ' ')
     {
-        for (int i = 0; i < 3; i++)
-        {
-            int j = 0;
-            if (A[i][j] == A[i][j + 1] && A[i][j] == A[i][j + 2] || A[j][i] == A[j + 1][i] && A[j][i] == A[j + 2][i])
-            {
-                if (A[i][j] == x)
-                {   goo=1;
-                cout<<"...";
-                    break;
-                    // cout<< "block 2 is being executed 1 ...";
-                }
-            }
-        }
+        A[0][1] = x;
+        return true;
     }
-    
-    
-        if(foo==0 || goo==1){
+    if (n == 3 && A[0][2] == ' ')
+    {
+        A[0][2] = x;
+        return true;
+    }
+    if (n == 4 && A[1][0] == ' ')
+    {
+        A[1][0] = x;
+        return true;
+    }
+    if (n == 5 && A[1][1] == ' ')
+    {
+        A[1][1] = x;
+        return true;
+    }
+    if (n == 6 && A[1][2] == ' ')
+    {
+        A[1][2] = x;
+        return true;
+    }
+    if (n == 7 && A[2][0] == ' ')
+    {
+        A[2][0] = x;
+        return true;
+    }
+    if (n == 8 && A[2][1] == ' ')
+    {
+        A[2][1] = x;
+        return true;
+    }
+    if (n == 9 && A[2][2] == ' ')
+    {
+        A[2][2] = x;
+        return true;
+    }
+    return false;
+}
+bool Checkwin(char A[3][3], char x)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        int j = 0;
+        if (A[i][j] == A[i][j + 1] && A[i][j] == A[i][j + 2] && A[i][j] != ' ')
+        {
             return true;
         }
-        return false;
-    
+    }
+    for (int j = 0; j < 3; j++)
+    {
+        int i = 0;
+        if (A[i][j] == A[i + 1][j] && A[i][j] == A[i + 2][j] && A[i][j] != ' ')
+        {
+            return true;
+        }
+    }
+    if (A[0][0] == A[1][1] && A[0][0] == A[2][2] && A[0][0] != ' ')
+    {
+        return true;
+    }
+    if (A[0][2] == A[1][1] && A[1][1] == A[2][0] && A[1][1] != ' ')
+    {
+        return true;
+    }
+    return false;
 }
-
-
+bool Legalmove(int n,char x)
+{
+    if (n > 9 || n < 1 || !isalpha(x))
+    {
+        return false;
+    }
+    return true;
+}
 int main()
 {
-    char A[3][3] = {0};
-    int row, column;
-    char x, y;
-    int iterator;
-    int fount = 1, mount = 1;
-    for (iterator = 0; iterator < 5; iterator++)
+    char A[3][3];
+    for (int i = 0; i < 3; i++)
     {
-        cout << "Player 1 may give the input: ";
-        cin >> row;
-        
-        cin >> column;
-        
-        cin >> x;
-
-        A[row][column] = x;
-
-        if (iterator >= 2 && Check(A, x) == 1)
+        for (int j = 0; j < 3; j++)
         {
-            cout << "Player 1 has won...";
-            fount = 0;
+            A[i][j] = ' ';
+        }
+    }
+    int n, count = 9;
+    char x, y;
+    while (count>0)//isEmpty(A)
+    {
+        cout << "Player 1 should play ";
+        cin >> n;
+        cin >> x;
+        if (!(Legalmove(n,x)) || !(Setvalues(A, n, x)))
+        {
             break;
         }
-        if (fount == 1 && iterator < 4)
-        {
-            cout << "Player 2 may give the input: ";
-            cin >> row;
-            
-            cin >> column;
-            
-            cin >> y;
 
-            A[row][column] = y;
-            if (iterator >=2 && Check(A, y)==1 )
+        count--;
+
+        if (count < 5)
+        {
+            if (Checkwin(A, x))
             {
-                cout << "Player 2 has won...";
-                mount = 0;
-                break;
+                cout << "player 1 has won!!!";
+                return 1;
             }
+            if(count==0){
+            cout << "It's a tie";
+            return 1;
         }
+            
+        }
+        cout << "Player 2 should play ";
+        cin >> n;
+        cin >> y;
+        if (!(Legalmove(n,y)) || !(Setvalues(A, n, y)))
+        {
+            break;
+        }
+        count--;
+
+        if (count < 5)
+        {
+            if (Checkwin(A, y))
+            {
+                cout << "player 2 has won!!!";
+                return 1;
+            }
+            if(count==0){
+            cout << "It's a tie";
+            return 1;
+        }
+            
+        }
+        
     }
-    if (mount == 1 && fount == 1 )
-    {
-        cout << "It's a tie... ";
-    }
+    
 
     return 0;
 }
