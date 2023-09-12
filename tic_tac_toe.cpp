@@ -1,154 +1,156 @@
 #include <iostream>
+#include <vector>
 #include <cctype>
+#include <utility>
+#include <map>
+
 using namespace std;
 
-bool Setvalues(char A[3][3], int n, char x)
+char humanplayer = 'x';
+char AIplayer = 'y';
+
+vector<int> CheckEmpty(int A[9])
 {
-    if (n == 1 && A[0][0] == ' ')
+    vector<int> vec;
+    for (int i = 0; i < 9; i++)
     {
-        A[0][0] = x;
-        return true;
+        if (A[i] != humanplayer && A[i] != AIplayer)
+        {
+            vec.push_back(i);
+        }
     }
-    if (n == 2 && A[0][1] == ' ')
-    {
-        A[0][1] = x;
-        return true;
-    }
-    if (n == 3 && A[0][2] == ' ')
-    {
-        A[0][2] = x;
-        return true;
-    }
-    if (n == 4 && A[1][0] == ' ')
-    {
-        A[1][0] = x;
-        return true;
-    }
-    if (n == 5 && A[1][1] == ' ')
-    {
-        A[1][1] = x;
-        return true;
-    }
-    if (n == 6 && A[1][2] == ' ')
-    {
-        A[1][2] = x;
-        return true;
-    }
-    if (n == 7 && A[2][0] == ' ')
-    {
-        A[2][0] = x;
-        return true;
-    }
-    if (n == 8 && A[2][1] == ' ')
-    {
-        A[2][1] = x;
-        return true;
-    }
-    if (n == 9 && A[2][2] == ' ')
-    {
-        A[2][2] = x;
-        return true;
-    }
-    return false;
+    return vec;
 }
-bool Checkwin(char A[3][3], char x)
+
+bool CheckWinning(int A[9], char player)
 {
-    for (int i = 0; i < 3; i++)
-    {
-        int j = 0;
-        if (A[i][j] == A[i][j + 1] && A[i][j] == A[i][j + 2] && A[i][j] != ' ')
-        {
-            return true;
-        }
-    }
-    for (int j = 0; j < 3; j++)
-    {
-        int i = 0;
-        if (A[i][j] == A[i + 1][j] && A[i][j] == A[i + 2][j] && A[i][j] != ' ')
-        {
-            return true;
-        }
-    }
-    if (A[0][0] == A[1][1] && A[0][0] == A[2][2] && A[0][0] != ' ')
-    {
-        return true;
-    }
-    if (A[0][2] == A[1][1] && A[1][1] == A[2][0] && A[1][1] != ' ')
+    if ((A[0] == player && A[1] == player && A[2] == player) ||
+        (A[3] == player && A[4] == player && A[5] == player) ||
+        (A[6] == player && A[7] == player && A[8] == player) ||
+        (A[0] == player && A[3] == player && A[6] == player) ||
+        (A[1] == player && A[4] == player && A[7] == player) ||
+        (A[2] == player && A[5] == player && A[8] == player) ||
+        (A[0] == player && A[4] == player && A[8] == player) ||
+        (A[2] == player && A[4] == player && A[6] == player))
     {
         return true;
     }
     return false;
 }
-bool Legalmove(int n,char x)
+pair<int, int> Minimax(int A[9], char player)
 {
-    if (n > 9 || n < 1 || !isalpha(x))
+vector<int> vec = CheckEmpty(A);
+
+
+if (CheckWinning(A, humanplayer))
+{
+    return make_pair(-10, -1);
+}
+else if (CheckWinning(A, AIplayer))
+{
+    return make_pair(10, -1);
+}
+else if (vec.size() == 0)
+{
+    return make_pair(0, -1);
+}
+int score, index;
+vector<pair<int, int>> Myvec;
+
+for (int i = 0; i < vec.size(); i++)
+{
+    index = A[vec[i]];
+    A[vec[i]] = player;
+
+    if (player == AIplayer)
     {
-        return false;
+        score = Minimax(A, humanplayer).first;
     }
-    return true;
+    else if (player == humanplayer)
+    {
+        score = Minimax(A, AIplayer).first;
+    }
+    A[vec[i]] = index;
+    Myvec.push_back(make_pair(score,vec[i]));
+}
+int bestmove = -1;
+
+if (player == AIplayer)
+{
+    int bestscore = -100000;
+    for (int i = 0; i < Myvec.size(); i++)
+    {
+        if (Myvec[i].first > bestscore)
+        {
+            bestscore = Myvec[i].first;
+            bestmove = i;
+        }
+    }
+}
+if (player == humanplayer)
+{
+    int bestscore = 100000;
+    for (int i = 0; i < Myvec.size(); i++)
+    {
+        if (Myvec[i].first < bestscore)
+        {
+            bestscore = Myvec[i].first;
+            bestmove = i;
+        }
+    }
+}
+return make_pair(Myvec[bestmove].first,Myvec[bestmove].second);
 }
 int main()
 {
-    char A[3][3];
-    for (int i = 0; i < 3; i++)
+    int A[9];
+    int n;
+
+    for (int i = 0; i < 9; i++)
     {
-        for (int j = 0; j < 3; j++)
-        {
-            A[i][j] = ' ';
-        }
+        A[i] = i;
     }
-    int n, count = 9;
-    char x, y;
-    while (count>0)//isEmpty(A)
+
+    for (int i = 0; i < 9; i++)
     {
-        cout << "Player 1 should play ";
+
+        cout << "It's human player's turn" << endl;
         cin >> n;
-        cin >> x;
-        if (!(Legalmove(n,x)) || !(Setvalues(A, n, x)))
-        {
-            break;
-        }
+        A[n] = humanplayer;
 
-        count--;
-
-        if (count < 5)
+        if (CheckEmpty(A).size() < 5)
         {
-            if (Checkwin(A, x))
+            if (CheckWinning(A, humanplayer))
             {
-                cout << "player 1 has won!!!";
+                cout << "Human won which isn't possible" << endl;
                 return 1;
             }
-            if(count==0){
-            cout << "It's a tie";
-            return 1;
-        }
-            
-        }
-        cout << "Player 2 should play ";
-        cin >> n;
-        cin >> y;
-        if (!(Legalmove(n,y)) || !(Setvalues(A, n, y)))
-        {
-            break;
-        }
-        count--;
-
-        if (count < 5)
-        {
-            if (Checkwin(A, y))
+            if (CheckEmpty(A).size() == 0)
             {
-                cout << "player 2 has won!!!";
+                cout << "Tie" << endl;
+                break;
+            }
+        }
+
+        cout << "It's AI player's turn" << endl;
+        pair<int, int> result = Minimax(A, AIplayer);
+        n = result.second;
+        A[n] = AIplayer;
+        cout << "AI plays at position " << n << endl;
+
+        if (CheckEmpty(A).size() < 5)
+        {
+            if (CheckWinning(A, AIplayer))
+            {
+                cout << "AI won!!!" << endl;
                 return 1;
             }
-            if(count==0){
-            cout << "It's a tie";
-            return 1;
+            if (CheckEmpty(A).size() == 0)
+            {
+                cout << "Tie" << endl;
+                break;
+            }
         }
-            
-        }
-        
     }
-    
-
     return 0;
 }
