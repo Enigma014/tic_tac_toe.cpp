@@ -16,7 +16,7 @@ Command-line environment (e.g., Terminal on macOS/Linux or Command Prompt on Win
 Clone this repository to your local machine:
 
 
-```git clone https://github.com/Enigma014/tic_tac_toe.cpp/edit/main/README.md```
+```git clone https://github.com/Enigma_014/tic_tac_toe```
 
 Navigate to the project directory:
 
